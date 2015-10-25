@@ -1,0 +1,17 @@
+{
+  "name": "tyler-sirens-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bluebird": "^2.10.2",
+    "hapi": "^11.0.2",
+    "require-dir": "^0.3.0",
+    "rethinkdb": "^2.1.1"
+  }
+}
