@@ -17,7 +17,6 @@ module.exports = {
 			.then(function(connection) {
 				return r.db('TylerSirens')
 					.table('calls')
-					.filter({nature: 'WELFARE CONCERN'})
 					.map(function(loc) {
                         return {
                             type: 'Feature',

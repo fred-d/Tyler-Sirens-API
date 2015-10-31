@@ -12,7 +12,7 @@ module.exports = {
 		cors: true
 	},
 	handler: function(request, response) {
-		var numBuckets = 20;
+		var numBuckets = 40;
 		
 		r.connect(util.makeConnection())
 			.then(function(connection) {
@@ -79,22 +79,38 @@ module.exports = {
 								};
 								
 								var buckets = calls.reduce(function(carry, call) {
-									carry.features.push({
-										type: "Feature",
-										geometry: {
-											type: "Polygon",
-											coordinates: [[
-												[call.bucketX * bucketWidth + minMax.minLng, call.bucketY * bucketHeight + minMax.minLat],
-												[(call.bucketX + 1) * bucketWidth + minMax.minLng, call.bucketY * bucketHeight + minMax.minLat],
-												[(call.bucketX + 1) * bucketWidth + minMax.minLng, (call.bucketY + 1) * bucketHeight + minMax.minLat],
-												[call.bucketX * bucketWidth + minMax.minLng, (call.bucketY + 1) * bucketHeight + minMax.minLat],
-												[call.bucketX * bucketWidth + minMax.minLng, call.bucketY * bucketHeight + minMax.minLat]
-											]]
-										}
+									var bucketNumber = (call.bucketX * call.bucketY - 1) + call.bucketY;
+									
+									if (!carry.features[bucketNumber]) {
+										carry.features[bucketNumber] = {
+											type: "Feature",
+											geometry: {
+												type: "Polygon",
+												coordinates: [[
+													[call.bucketX * bucketWidth + minMax.minLng, call.bucketY * bucketHeight + minMax.minLat],
+													[(call.bucketX + 1) * bucketWidth + minMax.minLng, call.bucketY * bucketHeight + minMax.minLat],
+													[(call.bucketX + 1) * bucketWidth + minMax.minLng, (call.bucketY + 1) * bucketHeight + minMax.minLat],
+													[call.bucketX * bucketWidth + minMax.minLng, (call.bucketY + 1) * bucketHeight + minMax.minLat],
+													[call.bucketX * bucketWidth + minMax.minLng, call.bucketY * bucketHeight + minMax.minLat]
+												]]
+											},
+											properties: {
+												calls: []
+											}
+										};
+									}
+									
+									carry.features[bucketNumber].properties.calls.push({
+										'id': call.id,
+										'nature': call.nature
 									});
 									
 									return carry;
 								}, collection);
+								
+								buckets.features = buckets.features.filter(function(cell) {
+									return cell !== null;
+								});
 								
 								response(buckets);
 							});
